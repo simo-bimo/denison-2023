@@ -41,3 +41,5 @@ This is a little thing I looked at on my own, because I wanted to do more quantu
 I have explicitly type-hinted as much as I can (everything that isn't a pain in python anyway), which is what all the `Callable[[np.ndarray], np.ndarray]]` stuff is. That means 'this argument should be a function which takes a numpy array as input and gives a numpy array as output'. This is generally just good programming practice, and though I know it's annoying it helps you avoid many stupid errors (and sometimes forces you to write better logic).
 
 Good luck! Have fun. :)
+
+P.S. There's also a TODO list in there, which serves as a bit of a log for the whole project.
