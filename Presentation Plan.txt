@@ -1,0 +1,27 @@
+What I've learnt:
+	I started with nearly no physics knowledge.
+	I've learnt a lot.
+
+Frame the problem:
+	We want to simulate quantum systems.
+	How many Qubits do we need to simulate a small quantum system?
+	What is the best way to do this?
+	Ivan proposed using a SOFT method to explicitly simulate every component (avoiding the Born Oppenheimer approximation) and proved it was both faster and more accurate than simulating both parts separately.
+	...
+	What's a simpler example I can work on? 1D hydrogen!
+	How do you avoid the singularity at x = 0? With a cutoff energy!
+		How much error does this introduce?
+		How difficult is it to adjust for this error?
+		This is what I worked on!
+
+My work:
+	I've made many (classical) simulations!
+		We start with a QHO, in 1 dimension, using a fock basis.
+		Then we do one with the split operator method (also one dimension).
+		We try it with a free particle (it seems about right).
+		Then we run it with a coulomb potential.
+		Then we run it with a coulomb potential, varying the values of v_cutoff
+		Then we plot the energy (and we see that it changes over time O_O) [Can you actually get this to work?]
+		We try a 3D simulation. It looks *mostly* right.
+		
+	
