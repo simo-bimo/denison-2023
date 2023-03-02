@@ -1,0 +1,320 @@
+:: Meeting Notes 9/1/2023
+
+Read through some of the group notion.
+	- Members, Group meetings, etc.
+	- Some of the textbook info.
+	- Software sections too.
+
+=================================================
+
+:: Meeting Notes 11/1/2023 ::
+
+PNAS 2008 - original paper.
+Chapter 1-3 in textbok.
+
+Hamiltonian Simulation
+
+Julia
+Qiskit:
+	- Connected to IBM with some good theory.
+	- Lookup for info on quantum fourier transform.
+Q-tip:
+	- Python library, quantum simulation package, so many qubits etc.
+
+Also checkout wavepackets.
+
+=================================================
+
+:: Meeting Notes 13/1/2023 ::
+
+Takeaways:
+1. Learn about harmonic oscillators (in the context of a harmonic bond), and how the solution is specifically derived.
+2. Program a classical simulation of evolving a quantum state of a harmonic oscillator. This program will have:
+	- n qubits.
+	- L length (-L/2 to L/2)
+	- No boundary condition (fades to zero, particle is local).
+	- A reasonable Psi wavefunction as input.
+	- Leads to 2^n different spaces in the grid (each binary number of n bits is like a location code, the coefficient of that particular arrangement of bits in the superposition (of the whole n qubits) is the amplitude of the wave at that point. We wish to evolve that wave function.
+3. Work towards a Coulomb potential interaction.
+
+=================================================
+16/1/2023
+
+Successfully graphed solutions of the time-independent schrodinger equation. This is just the eigenstates of various energy levels. The eigenvalue is the energy level associated with the given eigenstate.
+
+Need to do time-dependent simulation aswell. There is a good website bookmarked which goes through it. It's definitely worth trying to find some better sources on the theory too.
+
+=================================================
+
+17/1/2023
+
+Read through Tannor's QM textbook for Time-Dependent Schrodinger equation. It's very useful, and clarified many things intuitively.
+
+Need to figure out how to program the thing.
+
+=================================================
+
+18/1/2023
+
+Have begun programming the classical quantum harmonic oscillator, classically. i.e. with just numpy and arrays and such. No Qutip yet, making certain I understand everything.
+
+:: Meeting Notes 18/1/2023 ::
+
+Fock Basis = Basis of QHO eigenstates.
+Wave function is in sqrt(m^-1) units.
+Position and Momentum are conjugate variables (like time and frequency)
+
+
+Takeaways:
+1. Keep track of your units through transforms.
+2. Use |0> + |1> / sqrt(2) as a starting point (oscillates left and right)
+3. The fourier transform of a Gaussian is a Gaussian, so use that to test your thing.
+4. Ripples in a FT Gaussian imply the fock basis is too small (use some higher eigenstates)
+
+Have done a full program, midway through figuring out time dependent calculations. I think it might work, it's just that I've messed up my units and scaling somewhere. Need to investigate this further.
+Also worth checking to make sure I've implemented next_time_step right in the first place (regardless of units and stuff)
+
+=================================================
+
+19/1/2023
+
+I believe I've gotten it working!
+
+So far all my sanity checks make a good amount of sense. It turns out most of the reason it was broken was because i forgot to initialise an array to zero. Woooo!!!
+
+I may have scaled it a bit wrong though, I'm not certain all my functions are properly normalised, but they're at least self-consistent. It appears to be 1/100 as tall as it maybe should be.
+
+=================================================
+
+20/1/2023
+
+I've done some reading on the Quantum Fourier transform, and gone through some of the algebra. The textbook is very dense, and I believe it works, I've stepped through it, but I lack a bit of intuition, I might look at the Qiskit version next time.
+
+I'm also just about to read the chapter 2 section on Superdense Coding.
+
+I also made a slightly nicer gif of the 2D fock basis evolution, showing the values of each of the fock states.
+
+:: Meeting Notes 20/1/2023 ::
+
+Takeaways:
+1. Add dx to your fock_to_pos transform calculator (this should remove the need to normalise)
+	- Also check your endpoints, you may want to exclude an endpoint so you can have an exact gridpoint on zero. Not a big deal, just something to be aware of. Look at numpy.linspace docs.
+2. Program another simulator using the SOFT (Split Operator Fourier Transform) Method
+	- Watch out for the convention of inverse and regular fourier transforms, different people do it different (i.e. whether they put the + or - for the i).
+	- For now use harmonic oscillator potential to test (should be the same as classical version), make it possible to switch this out and solve for a different potential.
+	- Try reading through the 2009 paper once again.
+3. Read through Chapter 3 of Griffith textbook, to understand the formalisms for linear algebra and so on.
+
+=================================================
+
+23/1/2023
+
+I have made a full first go at a SOFT simulator. It's a little broken, but It seems to be mostly right. I've got the code quite organised aswell, and there's a few more plotting tools available.
+
+=================================================
+
+24/1/2023
+
+I've gotten it to oscillate at least. It looks a bit like a wave, though it doesn't behave it quite the right way. It becomes very tall in the middle.
+
+:: Meeting Notes 24/1/2023 ::
+
+Redefining the momentum space to be in some sense relative to position space appears to fix the issues.
+
+Main takeaways:
+	1. Finish up the details of this simulation.
+	2. Maybe try it on some other potentials, i.e. a free particle or a potential well (though you'll have to consider how to deal with the infinite energy jump, especially if your discretisation let's you cut through it for an instant, giving you infinite energy.
+	3. Also try find a way to give a particle some amount of momentum to start with. (Probably just set your momentum, and then chuck it in an IFFT).
+	4. Then begin reading up on Ivan's paper from 2008 (bookmarked), try to step through some of the maths if possible. Take a look at Tannor and Griffiths if you get stuck a lot.
+
+I'm going to read through the Griffiths and/or Tannor textbooks from the beginning mostly, aiming to get to chapter 3 of Griffiths if possible. Just to be sure that the formalisms and notation are very clear to me. Otherwise, I have a working SOFT simulator!! And then, we'll move on to Ivan's paper.
+
+=================================================
+
+27/1/2023
+
+Reading through PNAS Article. Questions so far:
+	- How is the implementation of V(x), i.e. as a range of values form 0 to 2^m -1, with m qubits, in any way a function of position?
+	- What the hell is phase kickback, how does it work, why is there a bonus iFFT involved in the gate sequence V, why is the ancilla register an eigenstate of addition. Idk what's really going on.
+	State Preparation:
+		- "Nuclear motions can be expressed in normal mode coordinates if the displacements from equilibrium are small, which is the case in molecules at chemically relevant temperatures." What precisely does this mean?
+	Measurement:
+		- "The reaction probability is the sum of the probabilities of finding the final wave packet in the product region(s)." Does this mean the product region as in literally a physical region where the wavepacket is, or it more a 'region' of the hilbert space of superpositions that would be considered products. How abstract is it?
+		- What is Q(t) for the reaction rate?
+		- What does 'correct thermal mixed state' mean?
+		- The maths on that is a little confusing.
+
+Things to do:
+	- Figure out tensor products.
+	- Figure out phase kickback.
+	- Re-read phase estimation algorithm (using the QFFT I think? I think it's in the Nielson Textbook).
+
+=================================================
+
+:: Meetings Notes 30/1/2023 ::
+
+Main takeaways:
+	1. Read up on maths, as in above to do list.
+	2. Put 1D Coulomb Potential in the Soft Simulator.
+	3. Do some reading on quantum arithmetic with Qutip or Quiskit (for implementing V|x, y> -> |x, y (+) V(x)> in ulimate algorithm) learning packages throughout.
+	4. Implementing Ivan's Algorithm using Qutip or Quiskit.
+
+=================================================
+
+31/1/2023
+
+I've read a few good articles on Tensors and feel like I've got the hang of them. Understanding tensors then made going through phase kickback much simpler.
+
+I've been reading up on Quantum Arithmetic, and have decided to first try and implement a QFT in qiskit, then a quantum adder circuit using that QFT, based on a fairly indepth medium article I've found.
+
+=================================================
+
+1/2/2023
+
+I believe I've gotten a first version of the QFT working in Qutip, though I'm not really sure. I've manually checked it against |01>, and it looks about right, but it's hard to know because qutip isn't very intuitive for plotting bloch spheres. I hoped to be able to see the different periods of the fock basis spinning around. I'll have to figure out some better tests, or just switch to Qiskit.
+
+Either way, I definitely feel like I understand it a little more. The powers of 2 of the tensor products are really starting to make sense to me.
+
+:: Meeting Notes 1/2/2023 ::
+
+How big is trotter error compared to adding a little vmax?
+The norm of the coulomb potential is infinite.
+
+Don't use position basis, (as the discretisation), use the 'conjugate momentum basis' which is better in a discrete setting.
+
+To get a delta function is position, you need a uniform constant function in momentum space (discretely). DFT it back, you don't get a delta, which has wiggles, this is the conjugate momentum basis. A bunch of wiggly wave packets about the size of the grid spacing.
+
+The hope is that the coulomb interaction is not infinite in this interaction.
+
+
+For simple problems we want a straight forward simple operator. We need to still understand errors, so can we set vmax to something and say there are no approximations, or can we find an upper limit to the possible interactions if we're in a grid in say the conjugate momentum basis.
+
+Do we need a V cutoff at all?
+
+Elliot thinks so in position, but not in conjugate momentum basis.
+
+How bad is the approximation of the conjugate momentum basis? Is it so bad that the potential energy function isn't even an eigenfunction?
+
+Takeaways:
+	1. Skim Ivan's Article "Quantum simulation of exact electron dynamics can be more efficient than classical mean-field methods"
+		Don't worry too much about the classical simulation stuff. Just the first quantisation stuff.
+		Also in appendix D, there's the v_max thing.
+	2. Skim article from Elliot.
+	3. Don't waste your time on Quantum Arithmetic at all, check if qiskit and/or qutip can do some of that already.
+	4. Think about 1/v vmax things. Try doing those calculations.
+	5. Just do what feels right (probably super dig into theory or something).
+
+I read a good chunk of Elliot's paper (about a third, up to section III). It's quite good.
+
+=================================================
+
+2/2/2023
+
+I've read some of Ivan's paper, and now I've decided I want to see that the coulomb operator has an infinite potential energy when two things overlap. (It makes intuitive sense, I just want to make it work so I can watch it happen). So I'm going to try code up a Coulomb Potential Soft Simulator.
+
+I've edited the simulator to support a variation of parameters, running them all on the same graph so you can see exactly when they diverge. It's pretty cool. I was planning to read up on the other methods for simulating multiple particles, mainly the Hartree-Fock method. But I'll have to do that tomorrow.
+
+=================================================
+
+3/2/2023
+
+Elliot's given me a lot of things to think about: 
+	1. Measuring more precisely how the introduction of v_cutoff affects accuracy by seeing how, say, the energy changes over the course of the simulation.
+	2. Trying to use a different kind of cutoff. For instance could we set it to only use a cutoff for a finite set of points (for instance at exactly zero only)? How would this affect the general curvature.
+	3. Possible extend to 3D as it's more stable.
+	4. How do you actually put such a cutoff on a quantum computer?
+ 
+I had a go at plotting the energy for the QHO simulation. It is not flat. I think I've messed up the calculation somewhere, I'll take a look at it again a bit later. Once it works I'll move on to seeing how different cutoff values affect the energy over time.
+
+=================================================
+
+6/2/2023
+
+I'm starting off by trying to get my energy plot to work, and double checking I've put the right equation in.
+I've gotten it working, I was trying to apply the T operator to the momentum basis representation, but this is unnecessary because the position absis is the energy eigenvector of the whole hamiltonian, not just the potential energy component.
+
+I read through the article, and have also taken a little detour to read up on some quantum arithmetic. The addition algorithm using the QFT is pretty neat. I appreciate the approach.
+
+I've then spent a few hours trying to adapt the soft simulator into 3D. It's a bit tricky, because matplotlib likes to draw things in lots of different ways. Maybe I'll try to switch to Julia or something later on.
+
+=================================================
+
+7/2/2023
+
+I've gotten the stationary 3D stuff working. I also did the momentum basis, and I *think* it's correct. I've tried going through time step at a time but it's hard to tell if it's moving in a reasonable way without an animation, so I'll try do that next.
+
+I've mostly gotten it working. I'm trying to find a way to get it to play back a little smoother. It doesn't appear to be calculated quite accurately, so I'll have to spend some extra time making sure the maths I'm doing is correct. Nevermind, I cranked down the delta_t and added an extra qubit and now it looks great.
+
+=================================================
+
+8/2/2023
+
+I've spent an hour or so tweaking the 3D simulator. I basically adjusted the normalisation to account for extra volume, and ran a few simulations making sure that it behaves as expected. They're a little time consuming to run, as there are so many points, but runnig it with two few qubits leads to bad results. Works much better with small timesteps. I also started reading through Griffiths' derivation of the solutions for a hydrogen atom, so I can try put an eigenstate in and see if it's stable.
+
+I think after the meeting and photoshoot I'll get started on thinking about how to implement a cutoff on a quantum computer, mostly because that involves some quantum arithmetic, which is what I'm mainly interested in. I also need to talk to Ivan / Elliot about what I should focus on in my presentation.
+
+:: Meeting with Elliot 8/2/2023 ::
+
+Post Group Meeting, basically I have two options to aim for presentation:
+
+Physics:
+	- Compare exact solutions of hydrogen with cutoff. (in 3d)
+	- Use energy of the system. (Calculate expectation value of hamiltonian)
+		- Virial Theorem for momentum operator.
+
+Comp Sci:
+	- Try figure out exactly how a Coulomb potential would be implemented (gate complexity, qubit complexity, how these change with a vmax or not).
+	- Full quantum circuit with and without cutoff potential. (Look at the references in the paper).
+
+I'll have a look at the Comp Sci version first.
+
+I've read a bit of a paper by Kivlichan. They talk a good bit about the approximations they're using, which is good:
+	They say you can decompose V into a sim of unitary operators approximating V. 
+	Because it's diagonal in position, this can be done with signature matrices (why?)
+	The number of matrices needed is equal to the maximum possible norm of the operator (why??).
+	Which straight away means you need infinite matrices for a Coulomb potential.
+
+They then introduce the Vmax thing with slightly more maths that I don't quite get, and then Section 5 talks about how the error cannot be changed or bounded beyond 1 (which I'm taking as possible 100% error). I need to read section 5.
+
+=================================================
+
+9/2/2023
+
+I've spent a while trying to understand some of the quantum circuitry stuff. It's quite complicated. I think I'll try fix my energy calculations and then come back to it once I'm a bit mroe warmed up.
+
+This is not going well, I am taking the Virial theorem at it's word, but it seems to say the expectation value of the potential energy is the same as kinetic energy, i.e. there's always an exact 50/50 split of energy. THis seems stupid because it oscillates. The total energy should be constant, and in my simulator it seems like the potential energy oscillates in a nice way, but if its the same as kinetic energy, then the total energy most oscillate too.
+
+I just remembered expectation value is the average over time. Elliot lied to me.
+
+:: Meeting Notes 9/2/2023 ::
+
+Questions going in:
+	- What am I doing for the presentation?
+		Is it a summary of what of done, or more of a practice run for a research presentation?
+		Formal or informal?
+	- How much work can I reasonably do between now and then? I've been:
+		1. Reading up on the time complexity of the cutoff method, and how it might be implemented.
+		2. Trying to code / simulate the variations of the cutoff method with different values, etc, to see how useful it could be in practice.
+
+Presentation:
+	- Clarify the problem
+	- What have I studied.
+
+=================================================
+
+13/2/2023
+
+Today I am going to plan out my presentation. I have 10 minutes to:
+	- Talk about what I've learnt.
+	- Frame the problem.
+	- Talk about current methods / solutions
+	- Talk about where we'd like to go in the future.
+
+I've had a decent go, but I think I'm getting a little sick, because I can't seem to focus very well. Either way I've put together a vauge plan and some dot points.
+
+
+
+
+
+
+
